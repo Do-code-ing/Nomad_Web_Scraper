@@ -15,7 +15,6 @@ def get_last_page():
         pages.append(int(link.string))
 
     last_page = pages[-1]
-
     return last_page
 
 
@@ -28,13 +27,17 @@ def extract_job(soup):
     location = soup.find("div", {"class": "companyLocation"}).text
     job_id = soup["data-jk"]
 
-    return {"title": title, "company": company, "location": location, "link": f"https://www.indeed.com/viewjob?jk={job_id}"}
+    return {
+        "title": title,
+        "company": company,
+        "location": location,
+        "apply_link": f"https://www.indeed.com/viewjob?jk={job_id}"}
 
 
 def extract_jobs(last_pages):
     jobs = []
     for page in range(last_pages):
-        print(f"Scrapping page {page}")
+        print(f"Scrapping Indeed page {page}")
         result = requests.get(f"{URL}&start={page*LIMIT}")
         soup = BeautifulSoup(result.text, "html.parser")
         results = soup.find_all("a", {"class": "resultWithShelf"})
