@@ -20,19 +20,27 @@ def extract_indeed_pages():
     return last_page
 
 
+def extract_job(soup):
+    job_title = soup.find("h2", {"class": "jobTitle"})
+    title = job_title.find("span").string
+    if title == "new":
+        title = job_title.find_all("span")[1].string
+    company = soup.find("span", {"class": "companyName"}).string
+    location = soup.find("div", {"class": "companyLocation"}).text
+    job_id = soup["data-jk"]
+
+    return {"title": title, "company": company, "location": location, "link": f"https://www.indeed.com/viewjob?jk={job_id}"}
+
+
 def extract_indeed_jobs(last_pages):
     jobs = []
     for page in range(last_pages):
+        print(f"Scrapping page {page}")
         result = requests.get(f"{URL}&start={page*LIMIT}")
         soup = BeautifulSoup(result.text, "html.parser")
         results = soup.find_all("a", {"class": "resultWithShelf"})
         for result in results:
-            job_title = result.find("h2", {"class": "jobTitle"})
-            title = job_title.find("span").string
-            if title == "new":
-                title = job_title.find_all("span")[1].string
-
-            company = result.find("span", {"class": "companyName"}).string
-            print(title, "//", company)
+            job = extract_job(result)
+            jobs.append(job)
 
     return jobs
