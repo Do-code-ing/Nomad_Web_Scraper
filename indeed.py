@@ -29,9 +29,10 @@ def extract_indeed_jobs(last_pages):
         for result in results:
             job_title = result.find("h2", {"class": "jobTitle"})
             title = job_title.find("span").string
-
             if title == "new":
                 title = job_title.find_all("span")[1].string
 
-            print(title)
+            company = result.find("span", {"class": "companyName"}).string
+            print(title, "//", company)
+
     return jobs
