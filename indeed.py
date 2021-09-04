@@ -24,5 +24,14 @@ def extract_indeed_jobs(last_pages):
     jobs = []
     for page in range(last_pages):
         result = requests.get(f"{URL}&start={page*LIMIT}")
-        jobs.append(result)
+        soup = BeautifulSoup(result.text, "html.parser")
+        results = soup.find_all("a", {"class": "resultWithShelf"})
+        for result in results:
+            job_title = result.find("h2", {"class": "jobTitle"})
+            title = job_title.find("span").string
+
+            if title == "new":
+                title = job_title.find_all("span")[1].string
+
+            print(title)
     return jobs
